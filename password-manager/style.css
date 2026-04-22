@@ -1,4 +1,16 @@
 body {
   margin: 0;
-  padding: 0;
+}
+
+/* Title Bar */
+.titlebar {
+  -webkit-app-region: drag;
+  user-select: none;
+  padding: 0 10px;
+  height: 29px;
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  font-weight: bold;
+  border: #333 1px solid;
 }
