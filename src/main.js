@@ -7,12 +7,14 @@ const createWindow = () => {
     height: 600,
     title: "Password Manager",
     titleBarStyle: "hidden",
-    ...(process.platform !== "darwin" ? { titleBarOverlay: true } : {}), // Use titleBarOverlay on non-macOS platforms for a modern look
-    titleBarOverlay: {
-      color: "#fff", // Background color of the title bar
-      symbolColor: "#333", // Color of the window control symbols (close, minimize, maximize)
-      height: 30, // Height of the title bar
-    },
+    ...(process.platform !== "darwin"
+      ? {
+          titleBarOverlay: {
+            color: "#1a2933",
+            symbolColor: "#ffffff",
+          },
+        }
+      : {}),
   });
 
   win.loadFile("index.html");
