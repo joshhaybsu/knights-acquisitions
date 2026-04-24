@@ -231,3 +231,119 @@ main.login {
 .auth-switch-link:hover {
   color: #7ab3e0;
 }
+
+/* ── Form feedback messages ──────────────────────────────────────────── */
+.form-message {
+  font-size: 12.5px;
+  padding: 9px 12px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+}
+
+.form-message.hidden {
+  display: none;
+}
+
+.form-message.error {
+  background: rgba(220, 80, 80, 0.12);
+  border-color: rgba(220, 80, 80, 0.35);
+  color: #f08080;
+}
+
+.form-message.success {
+  background: rgba(80, 190, 140, 0.12);
+  border-color: rgba(80, 190, 140, 0.35);
+  color: #7dd4aa;
+}
+
+/* ── Modal overlay ───────────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+.modal-overlay.hidden {
+  display: none;
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal-card {
+  background: #1e3040;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 28px 28px 24px;
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: modalIn 0.2s ease forwards;
+}
+
+.modal-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: -0.2px;
+}
+
+.modal-header p {
+  margin-top: 6px;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.5;
+}
+
+.modal-header p strong {
+  color: rgba(255, 255, 255, 0.65);
+  font-weight: 500;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.modal-actions .login-btn {
+  flex: 1;
+  margin-top: 0;
+}
+
+/* ── Secondary button ────────────────────────────────────────────────── */
+.btn-secondary {
+  flex: 0 0 auto;
+  padding: 11px 18px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: rgba(255, 255, 255, 0.8);
+}
