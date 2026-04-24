@@ -42,25 +42,192 @@ p {
   padding: 0 4px;
   display: flex;
   align-items: center;
+  justify-content: center;
   -webkit-app-region: drag;
 }
 
 main {
   height: calc(100% - 30px);
   padding: 20px;
-  padding-bottom: 0; /* remove bottom padding from main */
+  padding-bottom: 0;
   overflow-y: auto;
   box-sizing: border-box;
+}
+
+.window-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 18px;
 }
 
 /* Push space after the last element */
 main > *:last-child {
   margin-bottom: 20px;
 }
-.window-title {
+
+
+
+ 
+/* Login / signup page layout */
+main.login {
   display: flex;
   align-items: center;
-  margin-left: 8px;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+ 
+/* Both cards share the same slot — only one is visible at a time */
+.auth-card {
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+ 
+.auth-card.hidden {
+  display: none;
+}
+ 
+/* Fade + slight upward slide on entry */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+ 
+/* Fade + slight downward slide on exit */
+@keyframes fadeSlideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+ 
+.auth-card.fading-in {
+  animation: fadeSlideIn 0.22s ease forwards;
+}
+ 
+.auth-card.fading-out {
+  animation: fadeSlideOut 0.18s ease forwards;
+}
+ 
+.login-header {
+  margin-bottom: 12px;
+}
+ 
+.login-header h1 {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  color: #fff;
+}
+ 
+.login-header p {
+  margin-top: 4px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.35);
+}
+ 
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+ 
+.field label {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+}
+ 
+.field input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 10px 14px;
   font-family: "Segoe UI", sans-serif;
-  font-size: 18px;
+  font-size: 14px;
+  color: #fff;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.18s ease, background 0.18s ease;
+  caret-color: #5b9bd5;
+}
+ 
+.field input:focus {
+  border-color: rgba(91, 155, 213, 0.6);
+  background: rgba(255, 255, 255, 0.08);
+}
+ 
+/* Override Chromium's autofill yellow background */
+.field input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 100px #1e3040 inset;
+  -webkit-text-fill-color: #fff;
+}
+ 
+.login-btn {
+  margin-top: 6px;
+  width: 100%;
+  padding: 11px;
+  background: #2e5f8a;
+  border: 1px solid rgba(91, 155, 213, 0.3);
+  border-radius: 6px;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  cursor: pointer;
+  letter-spacing: 0.2px;
+  transition: background 0.16s ease, border-color 0.16s ease, transform 0.1s ease;
+}
+ 
+.login-btn:hover {
+  background: #3a72a3;
+  border-color: rgba(91, 155, 213, 0.55);
+}
+ 
+.login-btn:active {
+  transform: scale(0.985);
+  background: #285480;
+}
+ 
+.divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.07);
+  margin: 4px 0;
+}
+ 
+/* Switch prompt below the button */
+.auth-switch {
+  margin-top: 2px;
+  text-align: center;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.3);
+}
+ 
+.auth-switch-link {
+  color: #5b9bd5;
+  cursor: pointer;
+  transition: color 0.15s ease;
+  -webkit-app-region: no-drag;
+}
+ 
+.auth-switch-link:hover {
+  color: #7ab3e0;
 }
