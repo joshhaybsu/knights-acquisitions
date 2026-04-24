@@ -5,7 +5,7 @@ const createWindow = () => {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
-    title: "Password Manager",
+    title: "Knights Acquisitions",
     titleBarStyle: "hidden",
     ...(process.platform !== "darwin"
       ? {
