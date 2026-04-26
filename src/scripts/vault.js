@@ -4,6 +4,24 @@ let editingId       = null;   // null = new entry, string id = editing existing
 let detailEntry     = null;   // entry currently shown in detail modal
 let detailPwVisible = false;
 
+// ── Eye icon helper ───────────────────────────────────────────────────────────
+const SVG_EYE_OPEN = `<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5Z" stroke="currentColor" stroke-width="1.4"/>
+  <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.4"/>
+</svg>`;
+
+const SVG_EYE_CLOSED = `<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M2 2l12 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+  <path d="M4.5 4.9C3 5.9 1.8 7 1 8c0 0 2.5 5 7 5 1.2 0 2.3-.3 3.2-.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+  <path d="M8 3c4.5 0 7 5 7 5-.6 1-1.6 2.2-2.9 3.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+  <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.4"/>
+</svg>`;
+
+// isVisible = true means the password is currently showing (so show the closed eye)
+function setEyeIcon(btn, isVisible) {
+  btn.innerHTML = isVisible ? SVG_EYE_CLOSED : SVG_EYE_OPEN;
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {
   currentUser = await window.api.me();
@@ -93,8 +111,9 @@ function openEntryModal(entry = null) {
   document.getElementById("entry-password").value = entry?.password ?? "";
   document.getElementById("entry-notes").value    = entry?.notes    ?? "";
 
-  // Reset password to hidden on open
+  // Reset password field and eye icon to hidden state on open
   document.getElementById("entry-password").type = "password";
+  setEyeIcon(document.getElementById("toggle-entry-password"), false);
 
   clearMsg(entryModalMsg);
   entryModal.classList.remove("hidden");
@@ -110,10 +129,19 @@ document.getElementById("add-entry-btn").addEventListener("click", () => openEnt
 document.getElementById("entry-modal-cancel").addEventListener("click", closeEntryModal);
 entryModal.addEventListener("click", (e) => { if (e.target === entryModal) closeEntryModal(); });
 
+// Enter key submits the entry modal (except from the notes textarea)
+["entry-title", "entry-website", "entry-username", "entry-password"].forEach((id) => {
+  document.getElementById(id).addEventListener("keydown", (e) => {
+    if (e.key === "Enter") document.getElementById("entry-modal-save").click();
+  });
+});
+
 // Show / hide password in entry form
 document.getElementById("toggle-entry-password").addEventListener("click", () => {
-  const input = document.getElementById("entry-password");
-  input.type  = input.type === "password" ? "text" : "password";
+  const input   = document.getElementById("entry-password");
+  const visible = input.type === "password";
+  input.type    = visible ? "text" : "password";
+  setEyeIcon(document.getElementById("toggle-entry-password"), visible);
 });
 
 document.getElementById("entry-modal-save").addEventListener("click", async () => {
@@ -170,6 +198,7 @@ function openDetail(entry) {
   document.getElementById("detail-username").textContent = entry.username || "—";
   document.getElementById("detail-password").textContent = "••••••••";
   document.getElementById("detail-notes").textContent    = entry.notes    || "—";
+  setEyeIcon(document.getElementById("detail-show-hide"), false);
 
   detailModal.classList.remove("hidden");
 }
@@ -189,6 +218,7 @@ document.getElementById("detail-show-hide").addEventListener("click", () => {
   document.getElementById("detail-password").textContent = detailPwVisible
     ? (detailEntry?.password ?? "")
     : "••••••••";
+  setEyeIcon(document.getElementById("detail-show-hide"), detailPwVisible);
 });
 
 // Copy buttons

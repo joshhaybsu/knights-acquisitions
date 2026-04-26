@@ -127,6 +127,26 @@ modal.addEventListener("click", (e) => {
   if (e.target === modal) modal.classList.add("hidden");
 });
 
+// ── Enter key shortcuts ───────────────────────────────────────────────────────
+// Signup card: enter on username opens the master password modal
+document.getElementById("signup-username").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") document.getElementById("signup-btn").click();
+});
+
+// Master password modal: enter on any field confirms
+["master-password", "master-confirm", "admin-key"].forEach((id) => {
+  document.getElementById(id).addEventListener("keydown", (e) => {
+    if (e.key === "Enter") document.getElementById("modal-confirm").click();
+  });
+});
+
+// Login card: enter on either field submits
+["login-username", "login-password"].forEach((id) => {
+  document.getElementById(id).addEventListener("keydown", (e) => {
+    if (e.key === "Enter") document.getElementById("login-btn").click();
+  });
+});
+
 // ── Login ─────────────────────────────────────────────────────────────────────
 loginBtn.addEventListener("click", async () => {
   const username = document.getElementById("login-username").value.trim();

@@ -60,9 +60,6 @@ main {
 main > *:last-child {
   margin-bottom: 20px;
 }
-
-
-
  
 /* Login / signup page layout */
 main.login {
