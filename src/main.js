@@ -3,6 +3,10 @@ const path = require("path");
 
 let win;
 
+// Sean start
+let isAuthenticated = false;
+// Sean end
+
 const createWindow = () => {
   win = new BrowserWindow({
     width: 800,
@@ -29,40 +33,64 @@ const createWindow = () => {
 
 // --- IPC handlers ---
 
-// Auth stubs: implemented in the auth feature commit
 ipcMain.handle("auth:signup", async (_event, { username, password }) => {
   return { ok: false, error: "Not implemented yet" };
 });
 
+// Sean start
 ipcMain.handle("auth:login", async (_event, { username, password }) => {
-  return { ok: false, error: "Not implemented yet" };
-});
+  if (!username || !password) {
+    return { ok: false, error: "Missing username or password" };
+  }
 
+  isAuthenticated = true;
+  win.loadFile("vault.html");
+
+  return { ok: true };
+});
+// Sean end
+
+// Sean start
 ipcMain.handle("auth:logout", async () => {
+  isAuthenticated = false;
   win.loadFile("index.html");
   return { ok: true };
 });
+// Sean end
 
-// Navigation: only allow known pages so renderers can't load arbitrary files
 const PAGES = {
   auth: "index.html",
   vault: "vault.html",
 };
 
+// Sean start
 ipcMain.handle("navigate", async (_event, page) => {
   const file = PAGES[page];
+
   if (!file) return { ok: false, error: `Unknown page: ${page}` };
+
+  if (page === "vault" && !isAuthenticated) {
+    return { ok: false, error: "Access denied. Please log in first." };
+  }
+
   win.loadFile(file);
   return { ok: true };
 });
+// Sean end
 
-// Vault stubs: implemented in the vault feature commit
 ipcMain.handle("vault:get-entries", async () => []);
-ipcMain.handle("vault:add-entry", async (_event, entry) => ({ ok: false, error: "Not implemented yet" }));
-ipcMain.handle("vault:update-entry", async (_event, { id, entry }) => ({ ok: false, error: "Not implemented yet" }));
-ipcMain.handle("vault:delete-entry", async (_event, id) => ({ ok: false, error: "Not implemented yet" }));
-
-// --- App lifecycle ---
+ipcMain.handle("vault:add-entry", async (_event, entry) => ({
+  ok: false,
+  error: "Not implemented yet",
+}));
+ipcMain.handle("vault:update-entry", async (_event, { id, entry }) => ({
+  ok: false,
+  error: "Not implemented yet",
+}));
+ipcMain.handle("vault:delete-entry", async (_event, id) => ({
+  ok: false,
+  error: "Not implemented yet",
+}));
 
 app.whenReady().then(() => {
   createWindow();
