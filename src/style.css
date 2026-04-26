@@ -35,6 +35,11 @@ p {
   display: none;
 }
 
+/* Generic visibility utility — used by JS to show/hide elements */
+.hidden {
+  display: none !important;
+}
+
 /* Invisible drag region — gives the OS a handle to move the window.
    No text or visible content so the modal overlay is always seamless. */
 .drag-region {
