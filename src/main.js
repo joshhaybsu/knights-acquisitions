@@ -4,7 +4,7 @@ const fs     = require("fs");
 const crypto = require("crypto");
 
 let win;
-let currentUser = null; // { id, username, isAdmin } — set on login, cleared on logout
+let currentUser = null; // { id, username, isAdmin, encKey } — set on login, cleared on logout
 
 // Sean start
 let isAuthenticated = false;
@@ -82,6 +82,65 @@ function hashPassword(password, salt) {
     .toString("hex");
 }
 
+// ── Vault encryption helpers ──────────────────────────────────────────────────
+// Each user's vault entries are AES-256-GCM encrypted with a key derived
+// from their master password. The key lives in memory only; it is never
+// written to disk.
+
+function deriveVaultKey(password, salt) {
+  // Different derivation context from the auth hash ("vault" suffix on salt)
+  return crypto.pbkdf2Sync(password, salt + ":vault", 100_000, 32, "sha512");
+}
+
+function encryptEntry(plainObj, encKey) {
+  const iv         = crypto.randomBytes(12);
+  const cipher     = crypto.createCipheriv("aes-256-gcm", encKey, iv);
+  const ciphertext = Buffer.concat([
+    cipher.update(JSON.stringify(plainObj), "utf8"),
+    cipher.final(),
+  ]);
+  const tag = cipher.getAuthTag();
+  return {
+    iv:   iv.toString("hex"),
+    tag:  tag.toString("hex"),
+    data: ciphertext.toString("hex"),
+  };
+}
+
+function decryptEntry(envelope, encKey) {
+  const decipher = crypto.createDecipheriv(
+    "aes-256-gcm",
+    encKey,
+    Buffer.from(envelope.iv, "hex"),
+  );
+  decipher.setAuthTag(Buffer.from(envelope.tag, "hex"));
+  const plain = Buffer.concat([
+    decipher.update(Buffer.from(envelope.data, "hex")),
+    decipher.final(),
+  ]);
+  return JSON.parse(plain.toString("utf8"));
+}
+
+// ── Vault file helpers ────────────────────────────────────────────────────────
+// Each user has their own vault file: vault-{userId}.json
+// Contents: array of { id, iv, tag, data }
+
+function vaultFilePath(userId) {
+  return path.join(app.getPath("userData"), `vault-${userId}.json`);
+}
+
+function readVault(userId) {
+  try {
+    return JSON.parse(fs.readFileSync(vaultFilePath(userId), "utf8"));
+  } catch {
+    return [];
+  }
+}
+
+function writeVault(userId, entries) {
+  fs.writeFileSync(vaultFilePath(userId), JSON.stringify(entries, null, 2), "utf8");
+}
+
 // ── Auth IPC ──────────────────────────────────────────────────────────────────
 
 ipcMain.handle("auth:signup", async (_event, { username, password, adminKey }) => {
@@ -122,21 +181,29 @@ ipcMain.handle("auth:login", async (_event, { username, password }) => {
   const hash = hashPassword(password, user.salt);
   if (hash !== user.hash) return { ok: false, error: "Invalid username or password." };
 
-  currentUser = { id: user.id, username: user.username, isAdmin: user.isAdmin };
+  // Derive vault encryption key from master password — stored in memory only
+  const encKey = deriveVaultKey(password, user.salt);
+
+  currentUser    = { id: user.id, username: user.username, isAdmin: user.isAdmin, encKey };
+  isAuthenticated = true;
   return { ok: true, isAdmin: user.isAdmin };
 });
 // Sean end
 
 // Sean start
 ipcMain.handle("auth:logout", async () => {
-  currentUser = null;
+  currentUser     = null;
+  isAuthenticated = false;
   win.loadFile("index.html");
   return { ok: true };
 });
 // Sean end
 
 ipcMain.handle("auth:me", async () => {
-  return currentUser; // null if not logged in
+  if (!currentUser) return null;
+  // Never expose the encryption key to the renderer
+  const { encKey: _encKey, ...safe } = currentUser;
+  return safe;
 });
 
 // ── Admin IPC ─────────────────────────────────────────────────────────────────
@@ -157,9 +224,9 @@ ipcMain.handle("admin:delete-user", async (_event, id) => {
   const users  = readUsers();
   const target = users.find((u) => u.id === id);
 
-  if (!target) return { ok: false, error: "User not found." };
+  if (!target)              return { ok: false, error: "User not found." };
   if (target.id === currentUser.id) return { ok: false, error: "You cannot delete your own account." };
-  if (target.isAdmin) return { ok: false, error: "Admin accounts cannot be deleted." };
+  if (target.isAdmin)       return { ok: false, error: "Admin accounts cannot be deleted." };
 
   writeUsers(users.filter((u) => u.id !== id));
   return { ok: true };
@@ -169,9 +236,9 @@ ipcMain.handle("admin:delete-user", async (_event, id) => {
 // Allowlist prevents renderers from loading arbitrary files via navigate()
 
 const PAGES = {
-  auth:    "index.html",
-  vault:   "vault.html",
-  admin:   "admin.html",
+  auth:  "index.html",
+  vault: "vault.html",
+  admin: "admin.html",
 };
 
 // Sean start
@@ -189,11 +256,63 @@ ipcMain.handle("navigate", async (_event, page) => {
 });
 // Sean end
 
-// ── Vault stubs: implemented in the vault feature commit ──────────────────────
-ipcMain.handle("vault:get-entries", async () => []);
-ipcMain.handle("vault:add-entry",    async (_event, _entry) => ({ ok: false, error: "Not implemented yet" }));
-ipcMain.handle("vault:update-entry", async (_event, _args)  => ({ ok: false, error: "Not implemented yet" }));
-ipcMain.handle("vault:delete-entry", async (_event, _id)    => ({ ok: false, error: "Not implemented yet" }));
+// ── Vault IPC ─────────────────────────────────────────────────────────────────
+
+ipcMain.handle("vault:get-entries", async () => {
+  if (!currentUser) return [];
+
+  const encrypted = readVault(currentUser.id);
+  return encrypted.map((env) => {
+    try {
+      const plain = decryptEntry(env, currentUser.encKey);
+      return { ...plain, id: env.id };
+    } catch {
+      return null; // skip corrupted entries
+    }
+  }).filter(Boolean);
+});
+
+ipcMain.handle("vault:add-entry", async (_event, entry) => {
+  if (!currentUser) return { ok: false, error: "Not authenticated." };
+
+  const entries = readVault(currentUser.id);
+  const id      = crypto.randomBytes(16).toString("hex");
+  const now     = new Date().toISOString();
+
+  entries.push({
+    id,
+    ...encryptEntry({ ...entry, createdAt: now, updatedAt: now }, currentUser.encKey),
+  });
+
+  writeVault(currentUser.id, entries);
+  return { ok: true, id };
+});
+
+ipcMain.handle("vault:update-entry", async (_event, { id, entry }) => {
+  if (!currentUser) return { ok: false, error: "Not authenticated." };
+
+  const entries = readVault(currentUser.id);
+  const idx     = entries.findIndex((e) => e.id === id);
+  if (idx === -1) return { ok: false, error: "Entry not found." };
+
+  // Preserve original createdAt
+  const existing = decryptEntry(entries[idx], currentUser.encKey);
+  const updated  = { ...entry, createdAt: existing.createdAt, updatedAt: new Date().toISOString() };
+
+  entries[idx] = { id, ...encryptEntry(updated, currentUser.encKey) };
+  writeVault(currentUser.id, entries);
+  return { ok: true };
+});
+
+ipcMain.handle("vault:delete-entry", async (_event, id) => {
+  if (!currentUser) return { ok: false, error: "Not authenticated." };
+
+  const entries = readVault(currentUser.id);
+  if (!entries.some((e) => e.id === id)) return { ok: false, error: "Entry not found." };
+
+  writeVault(currentUser.id, entries.filter((e) => e.id !== id));
+  return { ok: true };
+});
 
 // ── App lifecycle ─────────────────────────────────────────────────────────────
 
