@@ -90,6 +90,31 @@
         </p>
       </div>
     </main>
+
+    <!-- Sean start -->
+
+    <style>
+      .error-message {
+        color: red;
+        font-size: 0.9rem;
+        margin-top: 5px;
+      }
+    </style>
+
+    <script>
+      const signupError = document.createElement("p");
+      signupError.id = "signup-error";
+      signupError.className = "error-message";
+      document.getElementById("signup-card").appendChild(signupError);
+
+      const loginError = document.createElement("p");
+      loginError.id = "login-error";
+      loginError.className = "error-message";
+      document.getElementById("login-card").appendChild(loginError);
+    </script>
+
+    <!-- Sean end -->
+
     <script src="scripts/login.js"></script>
   </body>
 </html>
