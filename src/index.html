@@ -7,19 +7,17 @@
     <title>Knights Acquisitions</title>
   </head>
   <body>
-    <header class="titlebar">
-      <div class="window-title">
-        <span>Knights Acquisitions</span>
-      </div>
-    </header>
+    <div class="drag-region"></div>
 
     <main class="login">
-      <!-- Sign Up Form (default) -->
+      <!-- Sign Up Form -->
       <div class="auth-card" id="signup-card">
         <div class="login-header">
           <h1>Create account</h1>
           <p>Set up your vault to get started.</p>
         </div>
+
+        <div id="signup-message" class="form-message hidden"></div>
 
         <div class="field">
           <label for="signup-username">Username</label>
@@ -30,25 +28,9 @@
             spellcheck="false" />
         </div>
 
-        <div class="field">
-          <label for="signup-password">Password</label>
-          <input
-            type="password"
-            id="signup-password"
-            autocomplete="new-password" />
-        </div>
-
-        <div class="field">
-          <label for="signup-confirm">Confirm Password</label>
-          <input
-            type="password"
-            id="signup-confirm"
-            autocomplete="new-password" />
-        </div>
-
         <div class="divider"></div>
 
-        <button class="login-btn">Create Account</button>
+        <button class="login-btn" id="signup-btn">Create Account</button>
 
         <p class="auth-switch">
           Already have an account?
@@ -63,26 +45,28 @@
           <p>Enter your credentials to unlock your vault.</p>
         </div>
 
+        <div id="login-message" class="form-message hidden"></div>
+
         <div class="field">
-          <label for="username">Username</label>
+          <label for="login-username">Username</label>
           <input
             type="text"
-            id="username"
+            id="login-username"
             autocomplete="username"
             spellcheck="false" />
         </div>
 
         <div class="field">
-          <label for="password">Master Password</label>
+          <label for="login-password">Master Password</label>
           <input
             type="password"
-            id="password"
+            id="login-password"
             autocomplete="current-password" />
         </div>
 
         <div class="divider"></div>
 
-        <button class="login-btn">Login</button>
+        <button class="login-btn" id="login-btn">Login</button>
 
         <p class="auth-switch">
           Don't have an account?
@@ -91,29 +75,55 @@
       </div>
     </main>
 
-    <!-- Sean start -->
+    <!-- Master Password Modal -->
+    <div class="modal-overlay hidden" id="master-password-modal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>Set your master password</h2>
+          <p>
+            This password encrypts your vault.
+            <strong>It cannot be recovered</strong> if forgotten — store it
+            somewhere safe.
+          </p>
+        </div>
 
-    <style>
-      .error-message {
-        color: red;
-        font-size: 0.9rem;
-        margin-top: 5px;
-      }
-    </style>
+        <div id="modal-message" class="form-message hidden"></div>
 
-    <script>
-      const signupError = document.createElement("p");
-      signupError.id = "signup-error";
-      signupError.className = "error-message";
-      document.getElementById("signup-card").appendChild(signupError);
+        <div class="field">
+          <label for="master-password">Master Password</label>
+          <input
+            type="password"
+            id="master-password"
+            autocomplete="new-password" />
+        </div>
 
-      const loginError = document.createElement("p");
-      loginError.id = "login-error";
-      loginError.className = "error-message";
-      document.getElementById("login-card").appendChild(loginError);
-    </script>
+        <div class="field">
+          <label for="master-confirm">Confirm Master Password</label>
+          <input
+            type="password"
+            id="master-confirm"
+            autocomplete="new-password" />
+        </div>
 
-    <!-- Sean end -->
+        <div class="field">
+          <label for="admin-key" class="label-optional">
+            Admin Key <span class="label-hint">(leave blank for a standard account)</span>
+          </label>
+          <input
+            type="password"
+            id="admin-key"
+            autocomplete="off"
+            placeholder="Optional" />
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-secondary" id="modal-cancel">Cancel</button>
+          <button class="login-btn modal-confirm" id="modal-confirm">
+            Create Account
+          </button>
+        </div>
+      </div>
+    </div>
 
     <script src="scripts/login.js"></script>
   </body>

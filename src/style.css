@@ -35,15 +35,12 @@ p {
   display: none;
 }
 
-/* Styling of window frame and titlebar */
-.titlebar {
+/* Invisible drag region — gives the OS a handle to move the window.
+   No text or visible content so the modal overlay is always seamless. */
+.drag-region {
   height: 30px;
-  color: white;
-  padding: 0 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   -webkit-app-region: drag;
+  flex-shrink: 0;
 }
 
 main {
@@ -52,14 +49,6 @@ main {
   padding-bottom: 0;
   overflow-y: auto;
   box-sizing: border-box;
-}
-
-.window-title {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: "Segoe UI", sans-serif;
-  font-size: 18px;
 }
 
 /* Push space after the last element */
@@ -230,4 +219,257 @@ main.login {
  
 .auth-switch-link:hover {
   color: #7ab3e0;
+}
+
+/* ── Admin panel ─────────────────────────────────────────────────────── */
+.admin-main {
+  height: calc(100% - 30px);
+  padding: 28px 32px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+}
+
+.admin-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.admin-header-left h1 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.admin-header-left p {
+  margin-top: 3px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.user-table-wrap {
+  overflow-x: auto;
+}
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.user-table thead th {
+  text-align: left;
+  padding: 0 12px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.user-table tbody tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background 0.12s ease;
+}
+
+.user-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.user-table td {
+  padding: 12px;
+  color: rgba(255, 255, 255, 0.75);
+  vertical-align: middle;
+}
+
+.col-username {
+  font-weight: 500;
+  color: #fff !important;
+}
+
+.table-placeholder td {
+  padding: 20px 12px !important;
+  color: rgba(255, 255, 255, 0.25) !important;
+  font-style: italic;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+}
+
+.role-admin {
+  background: rgba(91, 155, 213, 0.18);
+  color: #7ab3e0;
+  border: 1px solid rgba(91, 155, 213, 0.3);
+}
+
+.role-user {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.self-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.25);
+  font-style: italic;
+}
+
+.btn-danger {
+  padding: 5px 12px;
+  background: transparent;
+  border: 1px solid rgba(220, 80, 80, 0.35);
+  border-radius: 5px;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: #f08080;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-danger:hover {
+  background: rgba(220, 80, 80, 0.12);
+  border-color: rgba(220, 80, 80, 0.6);
+}
+
+/* ── Form feedback messages ──────────────────────────────────────────── */
+.form-message {
+  font-size: 12.5px;
+  padding: 9px 12px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+}
+
+.form-message.hidden {
+  display: none;
+}
+
+.form-message.error {
+  background: rgba(220, 80, 80, 0.12);
+  border-color: rgba(220, 80, 80, 0.35);
+  color: #f08080;
+}
+
+.form-message.success {
+  background: rgba(80, 190, 140, 0.12);
+  border-color: rgba(80, 190, 140, 0.35);
+  color: #7dd4aa;
+}
+
+/* ── Modal overlay ───────────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+.modal-overlay.hidden {
+  display: none;
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal-card {
+  background: #1e3040;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 28px 28px 24px;
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: modalIn 0.2s ease forwards;
+}
+
+.modal-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: -0.2px;
+}
+
+.modal-header p {
+  margin-top: 6px;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.5;
+}
+
+.modal-header p strong {
+  color: rgba(255, 255, 255, 0.65);
+  font-weight: 500;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.modal-actions .login-btn {
+  flex: 1;
+  margin-top: 0;
+}
+
+/* ── Secondary button ────────────────────────────────────────────────── */
+.btn-secondary {
+  flex: 0 0 auto;
+  padding: 11px 18px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Optional field label with a muted hint */
+.label-optional {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.label-hint {
+  font-size: 10.5px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: rgba(255, 255, 255, 0.25);
 }
