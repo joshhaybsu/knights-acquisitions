@@ -35,3 +35,54 @@ document.getElementById("go-to-login").addEventListener("click", () => {
 document.getElementById("go-to-signup").addEventListener("click", () => {
   switchTo(loginCard, signupCard);
 });
+
+// Sean start
+
+const signupBtn = document.querySelector("#signup-card .login-btn");
+const loginBtn = document.querySelector("#login-card .login-btn");
+
+signupBtn.addEventListener("click", async () => {
+  const username = document.getElementById("signup-username").value;
+  const password = document.getElementById("signup-password").value;
+  const confirm = document.getElementById("signup-confirm").value;
+
+  const error = document.getElementById("signup-error");
+  error.textContent = "";
+
+  if (!username || !password || !confirm) {
+    error.textContent = "Fill in all fields";
+    return;
+  }
+
+  if (password !== confirm) {
+    error.textContent = "Passwords do not match";
+    return;
+  }
+
+  localStorage.setItem("username", username);
+  localStorage.setItem("password", password);
+
+  error.textContent = "Account created";
+
+  switchTo(signupCard, loginCard);
+});
+
+loginBtn.addEventListener("click", async () => {
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+
+  const error = document.getElementById("login-error");
+  error.textContent = "";
+
+  const savedUsername = localStorage.getItem("username");
+  const savedPassword = localStorage.getItem("password");
+
+  if (username !== savedUsername || password !== savedPassword) {
+    error.textContent = "Invalid login";
+    return;
+  }
+
+  await window.api.login(username, password);
+});
+
+// Sean end
