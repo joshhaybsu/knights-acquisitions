@@ -6,6 +6,10 @@ const crypto = require("crypto");
 let win;
 let currentUser = null; // { id, username, isAdmin } — set on login, cleared on logout
 
+// Sean start
+let isAuthenticated = false;
+// Sean end
+
 const createWindow = () => {
   win = new BrowserWindow({
     width: 800,
@@ -107,6 +111,7 @@ ipcMain.handle("auth:signup", async (_event, { username, password, adminKey }) =
   return { ok: true };
 });
 
+// Sean start
 ipcMain.handle("auth:login", async (_event, { username, password }) => {
   const users = readUsers();
   const user  = users.find((u) => u.username === username);
@@ -120,12 +125,15 @@ ipcMain.handle("auth:login", async (_event, { username, password }) => {
   currentUser = { id: user.id, username: user.username, isAdmin: user.isAdmin };
   return { ok: true, isAdmin: user.isAdmin };
 });
+// Sean end
 
+// Sean start
 ipcMain.handle("auth:logout", async () => {
   currentUser = null;
   win.loadFile("index.html");
   return { ok: true };
 });
+// Sean end
 
 ipcMain.handle("auth:me", async () => {
   return currentUser; // null if not logged in
@@ -161,12 +169,20 @@ const PAGES = {
   admin:   "admin.html",
 };
 
+// Sean start
 ipcMain.handle("navigate", async (_event, page) => {
   const file = PAGES[page];
+
   if (!file) return { ok: false, error: `Unknown page: ${page}` };
+
+  if (page === "vault" && !isAuthenticated) {
+    return { ok: false, error: "Access denied. Please log in first." };
+  }
+
   win.loadFile(file);
   return { ok: true };
 });
+// Sean end
 
 // ── Vault stubs: implemented in the vault feature commit ──────────────────────
 ipcMain.handle("vault:get-entries", async () => []);
