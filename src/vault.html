@@ -50,6 +50,106 @@
       </div>
     </main>
 
+    <!-- Add / Edit Entry Modal -->
+    <div class="modal-overlay hidden" id="entry-modal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2 id="entry-modal-title">Add entry</h2>
+        </div>
+
+        <div id="entry-modal-message" class="form-message hidden"></div>
+
+        <div class="field">
+          <label for="entry-title">Title</label>
+          <input type="text" id="entry-title" placeholder="e.g. Gmail" spellcheck="false" autocomplete="off" />
+        </div>
+
+        <div class="field">
+          <label for="entry-website">Website</label>
+          <input type="text" id="entry-website" placeholder="https://…" spellcheck="false" autocomplete="off" />
+        </div>
+
+        <div class="field">
+          <label for="entry-username">Username / Email</label>
+          <input type="text" id="entry-username" spellcheck="false" autocomplete="off" />
+        </div>
+
+        <div class="field">
+          <label for="entry-password">Password</label>
+          <div class="input-with-action">
+            <input type="password" id="entry-password" autocomplete="new-password" />
+            <button class="icon-btn" id="toggle-entry-password" title="Show / hide">
+              <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5Z" stroke="currentColor" stroke-width="1.4"/>
+                <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.4"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="entry-notes">Notes</label>
+          <textarea id="entry-notes" rows="3" placeholder="Optional notes…" spellcheck="false"></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-secondary" id="entry-modal-cancel">Cancel</button>
+          <button class="login-btn" id="entry-modal-save">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Entry Detail Modal -->
+    <div class="modal-overlay hidden" id="detail-modal">
+      <div class="modal-card">
+        <div class="detail-header">
+          <div class="detail-icon" id="detail-icon"></div>
+          <div class="detail-header-text">
+            <h2 id="detail-title"></h2>
+            <a class="detail-website" id="detail-website" target="_blank" rel="noopener noreferrer"></a>
+          </div>
+        </div>
+
+        <div class="detail-divider"></div>
+
+        <div class="detail-row">
+          <span class="detail-label">Username</span>
+          <div class="detail-value-row">
+            <span class="detail-value" id="detail-username"></span>
+            <button class="copy-btn" data-field="username">Copy</button>
+          </div>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-label">Password</span>
+          <div class="detail-value-row">
+            <span class="detail-value detail-password-dots" id="detail-password">••••••••</span>
+            <button class="icon-btn" id="detail-show-hide" title="Show / hide">
+              <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5Z" stroke="currentColor" stroke-width="1.4"/>
+                <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.4"/>
+              </svg>
+            </button>
+            <button class="copy-btn" data-field="password">Copy</button>
+          </div>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-label">Notes</span>
+          <p class="detail-notes" id="detail-notes"></p>
+        </div>
+
+        <div class="detail-divider"></div>
+
+        <div class="modal-actions">
+          <button class="btn-danger" id="detail-delete">Delete</button>
+          <div style="flex:1"></div>
+          <button class="btn-secondary" id="detail-close">Close</button>
+          <button class="login-btn" id="detail-edit">Edit</button>
+        </div>
+      </div>
+    </div>
+
     <script src="scripts/vault.js"></script>
   </body>
 </html>
