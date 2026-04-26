@@ -75,6 +75,7 @@ signupBtn.addEventListener("click", () => {
   // Reset modal state
   document.getElementById("master-password").value = "";
   document.getElementById("master-confirm").value = "";
+  document.getElementById("admin-key").value = "";
   clearMessage(modalMessage);
 
   modal.classList.remove("hidden");
@@ -86,6 +87,7 @@ modalConfirm.addEventListener("click", async () => {
   const username   = modal.dataset.username;
   const masterPw   = document.getElementById("master-password").value;
   const confirmPw  = document.getElementById("master-confirm").value;
+  const adminKey   = document.getElementById("admin-key").value;
   clearMessage(modalMessage);
 
   if (!masterPw) {
@@ -102,7 +104,7 @@ modalConfirm.addEventListener("click", async () => {
   }
 
   setLoading(modalConfirm, true);
-  const result = await window.api.signup(username, masterPw);
+  const result = await window.api.signup(username, masterPw, adminKey || null);
   setLoading(modalConfirm, false);
 
   if (!result.ok) {

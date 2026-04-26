@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Knights Acquisitions — Admin</title>
+  </head>
+  <body>
+    <div class="drag-region"></div>
+
+    <main class="admin-main">
+      <div class="admin-header">
+        <div class="admin-header-left">
+          <h1>User Management</h1>
+          <p>All registered accounts on this device.</p>
+        </div>
+        <button class="btn-secondary" id="back-btn">← Back to Vault</button>
+      </div>
+
+      <div id="admin-message" class="form-message hidden"></div>
+
+      <div class="user-table-wrap">
+        <table class="user-table">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Role</th>
+              <th>Created</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="user-table-body">
+            <tr class="table-placeholder">
+              <td colspan="4">Loading…</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <script src="scripts/admin.js"></script>
+  </body>
+</html>
