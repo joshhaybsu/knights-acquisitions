@@ -52,9 +52,11 @@ function renderTable(users, myId) {
       </td>
       <td class="col-date">${formatDate(u.createdAt)}</td>
       <td class="col-action">
-        ${u.id !== myId
-          ? `<button class="btn-danger delete-btn" data-id="${u.id}">Delete</button>`
-          : `<span class="self-label">You</span>`
+        ${u.id === myId
+          ? `<span class="self-label">You</span>`
+          : u.isAdmin
+            ? `<span class="self-label">Protected</span>`
+            : `<button class="btn-danger delete-btn" data-id="${u.id}">Delete</button>`
         }
       </td>
     </tr>

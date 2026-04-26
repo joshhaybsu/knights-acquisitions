@@ -153,10 +153,15 @@ ipcMain.handle("admin:get-users", async () => {
 
 ipcMain.handle("admin:delete-user", async (_event, id) => {
   if (!currentUser?.isAdmin) return { ok: false, error: "Unauthorized." };
-  if (currentUser.id === id) return { ok: false, error: "You cannot delete your own account." };
 
-  const users = readUsers().filter((u) => u.id !== id);
-  writeUsers(users);
+  const users  = readUsers();
+  const target = users.find((u) => u.id === id);
+
+  if (!target) return { ok: false, error: "User not found." };
+  if (target.id === currentUser.id) return { ok: false, error: "You cannot delete your own account." };
+  if (target.isAdmin) return { ok: false, error: "Admin accounts cannot be deleted." };
+
+  writeUsers(users.filter((u) => u.id !== id));
   return { ok: true };
 });
 
