@@ -205,8 +205,14 @@ function openDetail(entry) {
 
 function closeDetail() {
   detailModal.classList.add("hidden");
+  resetDeleteConfirm();
   detailEntry     = null;
   detailPwVisible = false;
+}
+
+function resetDeleteConfirm() {
+  document.getElementById("detail-actions").classList.remove("hidden");
+  document.getElementById("detail-confirm-actions").classList.add("hidden");
 }
 
 document.getElementById("detail-close").addEventListener("click", closeDetail);
@@ -238,13 +244,19 @@ document.getElementById("detail-edit").addEventListener("click", () => {
   openEntryModal(entry);
 });
 
-// Delete from detail
-document.getElementById("detail-delete").addEventListener("click", async () => {
+// Delete from detail — show inline confirmation to avoid native dialog focus loss
+document.getElementById("detail-delete").addEventListener("click", () => {
   if (!detailEntry) return;
-  if (!confirm(`Delete "${detailEntry.title}"? This cannot be undone.`)) return;
+  document.getElementById("detail-actions").classList.add("hidden");
+  document.getElementById("detail-confirm-actions").classList.remove("hidden");
+});
 
+document.getElementById("detail-confirm-cancel").addEventListener("click", resetDeleteConfirm);
+
+document.getElementById("detail-confirm-ok").addEventListener("click", async () => {
+  if (!detailEntry) return;
   const result = await window.api.deleteEntry(detailEntry.id);
-  if (!result.ok) { alert(result.error); return; }
+  if (!result.ok) { resetDeleteConfirm(); alert(result.error); return; }
 
   closeDetail();
   await loadEntries();

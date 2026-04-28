@@ -141,11 +141,17 @@
 
         <div class="detail-divider"></div>
 
-        <div class="modal-actions">
+        <div class="modal-actions" id="detail-actions">
           <button class="btn-danger" id="detail-delete">Delete</button>
           <div style="flex:1"></div>
           <button class="btn-secondary" id="detail-close">Close</button>
           <button class="login-btn" id="detail-edit">Edit</button>
+        </div>
+
+        <div class="modal-actions hidden" id="detail-confirm-actions">
+          <span style="font-size:0.85rem;color:var(--text-muted,#aaa);flex:1">Delete this entry? This cannot be undone.</span>
+          <button class="btn-secondary" id="detail-confirm-cancel">Cancel</button>
+          <button class="btn-danger" id="detail-confirm-ok">Delete</button>
         </div>
       </div>
     </div>
