@@ -144,6 +144,20 @@ document.getElementById("toggle-entry-password").addEventListener("click", () =>
   setEyeIcon(document.getElementById("toggle-entry-password"), visible);
 });
 
+// Generate a random password and populate the field
+document.getElementById("generate-entry-password").addEventListener("click", () => {
+  const chars  = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$&*()-_:;,.?";
+  const length = 20;
+  const bytes  = new Uint32Array(length);
+  crypto.getRandomValues(bytes);
+  const password = Array.from(bytes, (b) => chars[b % chars.length]).join("");
+
+  const input = document.getElementById("entry-password");
+  input.value = password;
+  input.type  = "text";
+  setEyeIcon(document.getElementById("toggle-entry-password"), true);
+});
+
 document.getElementById("entry-modal-save").addEventListener("click", async () => {
   const title    = document.getElementById("entry-title").value.trim();
   const website  = document.getElementById("entry-website").value.trim();
