@@ -26,26 +26,6 @@ const createWindow = () => {
   win.loadFile("index.html");
 };
 
-// ── Admin key ─────────────────────────────────────────────────────────────────
-// Generated once on first launch and written to <userData>/admin-key.txt.
-// Anyone who needs to create an admin account reads it from that file.
-
-function adminKeyFilePath() {
-  return path.join(app.getPath("userData"), "admin-key.txt");
-}
-
-function getOrCreateAdminKey() {
-  const keyPath = adminKeyFilePath();
-  if (fs.existsSync(keyPath)) {
-    return fs.readFileSync(keyPath, "utf8").trim();
-  }
-  const key = crypto.randomBytes(24).toString("hex");
-  fs.writeFileSync(keyPath, key, "utf8");
-  return key;
-}
-
-let ADMIN_KEY; // loaded after app is ready (userData path not available before)
-
 // ── User database helpers ─────────────────────────────────────────────────────
 // Stored as a JSON array at <userData>/users.json
 // Each entry: { id, username, hash, salt, createdAt, isAdmin }
@@ -135,19 +115,16 @@ function writeVault(userId, entries) {
 
 // ── Auth IPC ──────────────────────────────────────────────────────────────────
 
-ipcMain.handle("auth:signup", async (_event, { username, password, adminKey }) => {
+ipcMain.handle("auth:signup", async (_event, { username, password }) => {
   const users = readUsers();
 
   if (users.some((u) => u.username === username)) {
     return { ok: false, error: "That username is already taken." };
   }
 
-  // Admin key must match exactly — wrong key silently creates a standard account
-  // (avoids leaking whether the key was correct)
-  const isAdmin = adminKey != null && adminKey === ADMIN_KEY;
-
-  const salt = crypto.randomBytes(32).toString("hex");
-  const hash = hashPassword(password, salt);
+  const salt    = crypto.randomBytes(32).toString("hex");
+  const hash    = hashPassword(password, salt);
+  const isAdmin = users.length === 0; // first account becomes admin
 
   users.push({
     id:        crypto.randomBytes(16).toString("hex"),
@@ -208,6 +185,20 @@ ipcMain.handle("admin:get-users", async () => {
   }));
 
   return { ok: true, users };
+});
+
+ipcMain.handle("admin:promote-user", async (_event, id) => {
+  if (!currentUser?.isAdmin) return { ok: false, error: "Unauthorized." };
+
+  const users  = readUsers();
+  const target = users.find((u) => u.id === id);
+
+  if (!target)          return { ok: false, error: "User not found." };
+  if (target.isAdmin)   return { ok: false, error: "User is already an admin." };
+
+  target.isAdmin = true;
+  writeUsers(users);
+  return { ok: true };
 });
 
 ipcMain.handle("admin:delete-user", async (_event, id) => {
@@ -315,7 +306,6 @@ ipcMain.on("window:close",    () => win.close());
 // ── App lifecycle ─────────────────────────────────────────────────────────────
 
 app.whenReady().then(() => {
-  ADMIN_KEY = getOrCreateAdminKey();
   createWindow();
 });
 

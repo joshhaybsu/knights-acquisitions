@@ -589,6 +589,30 @@ main.login {
   font-style: italic;
 }
 
+.col-action-btns {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.btn-promote {
+  padding: 5px 12px;
+  background: transparent;
+  border: 1px solid rgba(91, 155, 213, 0.35);
+  border-radius: 5px;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: #5b9bd5;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-promote:hover {
+  background: rgba(91, 155, 213, 0.12);
+  border-color: rgba(91, 155, 213, 0.6);
+}
+
 .btn-danger {
   padding: 5px 12px;
   background: transparent;

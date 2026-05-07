@@ -56,16 +56,41 @@ function renderTable(users, myId) {
           ? `<span class="self-label">You</span>`
           : u.isAdmin
             ? `<span class="self-label">Protected</span>`
-            : `<button class="btn-danger delete-btn" data-id="${u.id}">Delete</button>`
+            : `<div class="col-action-btns">
+                <button class="btn-promote promote-btn" data-id="${u.id}">Make Admin</button>
+                <button class="btn-danger delete-btn" data-id="${u.id}">Delete</button>
+               </div>`
         }
       </td>
     </tr>
   `).join("");
 
-  // Attach delete handlers
   tbody.querySelectorAll(".delete-btn").forEach((btn) => {
     btn.addEventListener("click", () => deleteUser(btn.dataset.id, users));
   });
+
+  tbody.querySelectorAll(".promote-btn").forEach((btn) => {
+    btn.addEventListener("click", () => promoteUser(btn.dataset.id, users));
+  });
+}
+
+async function promoteUser(id, users) {
+  const user = users.find((u) => u.id === id);
+  if (!user) return;
+  if (!confirm(`Make "${user.username}" an admin? This cannot be undone.`)) return;
+
+  clearMessage();
+  const result = await window.api.promoteUser(id);
+
+  if (!result.ok) {
+    showMessage(result.error, "error");
+    return;
+  }
+
+  const updated = users.map((u) => u.id === id ? { ...u, isAdmin: true } : u);
+  const me = await window.api.me();
+  renderTable(updated, me.id);
+  showMessage(`"${user.username}" is now an admin.`, "success");
 }
 
 async function deleteUser(id, users) {

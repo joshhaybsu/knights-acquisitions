@@ -2,14 +2,15 @@ const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("api", {
   // Auth
-  signup:  (username, password, adminKey) => ipcRenderer.invoke("auth:signup", { username, password, adminKey }),
+  signup:  (username, password) => ipcRenderer.invoke("auth:signup", { username, password }),
   login:   (username, password) => ipcRenderer.invoke("auth:login",  { username, password }),
   logout:  ()                   => ipcRenderer.invoke("auth:logout"),
   me:      ()                   => ipcRenderer.invoke("auth:me"),
 
   // Admin
-  getUsers:   ()   => ipcRenderer.invoke("admin:get-users"),
-  deleteUser: (id) => ipcRenderer.invoke("admin:delete-user", id),
+  getUsers:    ()   => ipcRenderer.invoke("admin:get-users"),
+  promoteUser: (id) => ipcRenderer.invoke("admin:promote-user", id),
+  deleteUser:  (id) => ipcRenderer.invoke("admin:delete-user", id),
 
   // Vault
   getEntries:  ()            => ipcRenderer.invoke("vault:get-entries"),
