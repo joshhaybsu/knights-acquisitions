@@ -16,14 +16,6 @@ const createWindow = () => {
     height: 600,
     title: "Knights Acquisitions",
     titleBarStyle: "hidden",
-    ...(process.platform !== "darwin"
-      ? {
-          titleBarOverlay: {
-            color: "#1a2933",
-            symbolColor: "#ffffff",
-          },
-        }
-      : {}),
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
@@ -313,6 +305,12 @@ ipcMain.handle("vault:delete-entry", async (_event, id) => {
   writeVault(currentUser.id, entries.filter((e) => e.id !== id));
   return { ok: true };
 });
+
+// ── Window controls ───────────────────────────────────────────────────────────
+
+ipcMain.on("window:minimize", () => win.minimize());
+ipcMain.on("window:maximize", () => { win.isMaximized() ? win.unmaximize() : win.maximize(); });
+ipcMain.on("window:close",    () => win.close());
 
 // ── App lifecycle ─────────────────────────────────────────────────────────────
 

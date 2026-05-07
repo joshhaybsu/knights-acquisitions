@@ -40,12 +40,48 @@ p {
   display: none !important;
 }
 
-/* Invisible drag region — gives the OS a handle to move the window.
-   No text or visible content so the modal overlay is always seamless. */
+/* Drag region doubles as the custom titlebar row */
 .drag-region {
   height: 30px;
   -webkit-app-region: drag;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.window-controls {
+  display: flex;
+  -webkit-app-region: no-drag;
+}
+
+.win-btn {
+  width: 46px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: background 0.1s ease, color 0.1s ease;
+}
+
+.win-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.win-close:hover {
+  background: #c42b1c;
+  color: #fff;
+}
+
+.win-btn svg {
+  width: 10px;
+  height: 10px;
+  display: block;
 }
 
 main {

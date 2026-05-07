@@ -19,4 +19,9 @@ contextBridge.exposeInMainWorld("api", {
 
   // Navigation (main process drives window.loadFile)
   navigate: (page) => ipcRenderer.invoke("navigate", page),
+
+  // Window controls
+  minimize: () => ipcRenderer.send("window:minimize"),
+  maximize: () => ipcRenderer.send("window:maximize"),
+  close:    () => ipcRenderer.send("window:close"),
 });
